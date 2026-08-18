@@ -1566,23 +1566,38 @@ function classifyScriptLines(script) {
     return out;
 }
 
-// Carga el logo FAP una sola vez y lo cachea como dataURL
-let logoDataUrlPromise = null;
-function getLogoDataURL() {
-    if (!logoDataUrlPromise) {
-        logoDataUrlPromise = fetch('logo-fap.png')
-            .then(function(r) { if (!r.ok) throw new Error('no logo'); return r.blob(); })
-            .then(function(blob) {
-                return new Promise(function(resolve) {
-                    const fr = new FileReader();
-                    fr.onload = function() { resolve(fr.result); };
-                    fr.onerror = function() { resolve(null); };
-                    fr.readAsDataURL(blob);
-                });
-            })
-            .catch(function() { return null; });
+// Carga el logo una sola vez como <img> y lo cachea
+let logoImgPromise = null;
+function getLogoImage() {
+    if (!logoImgPromise) {
+        logoImgPromise = new Promise(function(resolve) {
+            const img = new Image();
+            img.onload = function() { resolve(img); };
+            img.onerror = function() { resolve(null); };
+            img.src = 'logo-fap.png';
+        });
     }
-    return logoDataUrlPromise;
+    return logoImgPromise;
+}
+
+// Aplana el logo (que es transparente) sobre un color plano.
+// jsPDF embebe los PNG con alpha usando SMask, lo que produce
+// bordes oscuros pixelados en algunos visores; al aplanarlo
+// primero el PNG resultante es RGB puro (sin SMask) y el PDF
+// ademas queda 6 veces mas liviano.
+function flattenLogo(img, color) {
+    try {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth || img.width;
+        c.height = img.naturalHeight || img.height;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0);
+        return c.toDataURL('image/png');
+    } catch (e) {
+        return null;
+    }
 }
 
 function exportPdf() {
@@ -1594,7 +1609,8 @@ function exportPdf() {
     }
     const title = extractTitle(script);
 
-    getLogoDataURL().then(function(logoData) {
+    getLogoImage().then(function(logoImg) {
+        const coverLogo = logoImg ? flattenLogo(logoImg, '#ffdc00') : null;
         const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
         const pageW = doc.internal.pageSize.getWidth();
         const pageH = doc.internal.pageSize.getHeight();
@@ -1610,17 +1626,17 @@ function exportPdf() {
         // franja superior negra
         doc.setFillColor(INK[0], INK[1], INK[2]);
         doc.rect(0, 0, pageW, 14, 'F');
-        // logo free script power (3:2)
-        if (logoData) doc.addImage(logoData, 'PNG', pageW / 2 - 100, 62, 200, 133);
+        // logo free script power (3:2, aplanado sobre el amarillo)
+        if (coverLogo) doc.addImage(coverLogo, 'PNG', pageW / 2 - 100, 62, 200, 133);
         // titulo de la app
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(34);
         doc.setTextColor(INK[0], INK[1], INK[2]);
-        doc.text('SCRIPT AI', pageW / 2, logoData ? 264 : 150, { align: 'center' });
+        doc.text('SCRIPT AI', pageW / 2, coverLogo ? 264 : 150, { align: 'center' });
         // titulo del guion
         doc.setFontSize(19);
         const wrappedTitle = doc.splitTextToSize(title, pageW - 140);
-        const titleY = logoData ? 300 : 180;
+        const titleY = coverLogo ? 300 : 180;
         doc.text(wrappedTitle, pageW / 2, titleY, { align: 'center' });
         const titleEndY = titleY + (wrappedTitle.length - 1) * 24;
         // separador
@@ -1716,20 +1732,17 @@ function exportPdf() {
             doc.setFontSize(10);
         }
 
-        // ---------- MARCA DE AGUA EN CADA PAGINA ----------
+        // ---------- PIE SUTIL EN CADA PAGINA DE GUION ----------
+        // Solo texto gris claro: los PNG con alpha embebidos con SMask
+        // se ven mal en estas hojas y la opacidad GState es poco fiable
+        // entre visores. El logo ya luce grande y nitido en la portada.
         const totalPages = doc.internal.getNumberOfPages();
         for (let p = 2; p <= totalPages; p++) {
             doc.setPage(p);
-            doc.saveGraphicsState();
-            try { doc.setGState(new doc.GState({ opacity: 0.07 })); } catch (e) {}
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
-            doc.setTextColor(INK[0], INK[1], INK[2]);
-            doc.text('freeanimationpower.org  ·  fierroduque.com', pageW / 2, pageH - 30, { align: 'center' });
-            if (logoData) {
-                doc.addImage(logoData, 'PNG', pageW / 2 - 10.5, pageH - 24, 21, 14);
-            }
-            doc.restoreGraphicsState();
+            doc.setTextColor(200, 200, 200);
+            doc.text('freeanimationpower.org  ·  fierroduque.com', pageW / 2, pageH - 28, { align: 'center' });
         }
 
         doc.save(slugify(title) + '.pdf');
