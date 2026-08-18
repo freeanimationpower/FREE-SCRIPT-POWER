@@ -287,8 +287,25 @@ El endpoint `/api/chat` **no acepta URLs arbitrarias**. `validateProxyUrl()` apl
 - Comparacion **exacta** de hostname en minusculas (bloquea `api.openai.com.evil.com` y similares).
 - Prohibido: credenciales en URL (`https://user@host`), puertos no estandar, protocolos no http(s), redirecciones 3xx (no se siguen).
 - `localhost` bloqueado por defecto; activable solo con `ALLOW_LOCALHOST=1` (Ollama / LM Studio), solo http y puertos de IA conocidos.
+- **Anti DNS rebinding**: `secureLookup` resuelve el hostname en el momento de conectar y bloquea la conexion si alguna IP es privada, loopback, link-local o reservada (10/8, 172.16/12, 192.168/16, 127/8, 169.254/16, 100.64/10, `::1`, ULA, fe80::/10...). Protege en caso de que se agreguen hosts propios via `SSRF_EXTRA_HOSTS`.
 - Anti-DoS: body maximo 4 MB, key maximo 512 caracteres sin saltos de linea.
 - Respuesta 403 en texto plano (para que el cliente lo distinga de un error del proveedor).
+
+### Anti path traversal (servidor)
+
+Los archivos estaticos se sirven desde una **whitelist cerrada** (`/index.html`, `/app.js`, `/logo-fap.png`). Cualquier otra ruta (incluidos intentos con `../`, `%2e%2e`, backslashes o query strings) responde 404. Esto impide leer `server.js`, un hipotetico `.env` o cualquier archivo del servidor.
+
+### Rate limit (servidor)
+
+`/api/chat` limita a **30 peticiones por minuto por IP** (token bucket en memoria). Pasado el limite responde `429`. Pensado para evitar que el proxy se use como relay abierto o se abuse del hosting.
+
+### CORS
+
+`Access-Control-Allow-Origin` es configurable con `CORS_ORIGIN`. Por defecto `*` (desarrollo); en produccion se recomienda fijarlo al dominio oficial, ej. `CORS_ORIGIN=https://freeanimationpower.org`. Si la app y el proxy viven en el mismo dominio, CORS no interviene.
+
+### Headers de seguridad
+
+Los estaticos se sirven con `X-Content-Type-Options: nosniff` y `X-Frame-Options: DENY`. Metodos no permitidos (`POST` a estaticos, `GET` a `/api/chat`) responden `405`.
 
 ### Heartbeat anti-timeout
 
@@ -339,6 +356,7 @@ Wrapper `lsSet()` con limpieza de emergencia ante `QuotaExceededError` (codigo 2
 | `UPSTREAM_TIMEOUT_MS` | `120000` | Timeout de la peticion al proveedor |
 | `ALLOW_LOCALHOST` | `(off)` | `1` para permitir proveedores locales (Ollama/LM Studio) |
 | `SSRF_EXTRA_HOSTS` | `(vacio)` | Hosts extra permitidos en el proxy, separados por comas |
+| `CORS_ORIGIN` | `*` | Origen permitido en CORS; fijar al dominio oficial en produccion |
 
 Ejemplo:
 

@@ -27,12 +27,98 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const dns = require('dns');
 
 const PORT = process.env.PORT || 3000;
 const HEARTBEAT_MS = parseInt(process.env.HEARTBEAT_MS, 10) || 15000;
 const UPSTREAM_TIMEOUT_MS = parseInt(process.env.UPSTREAM_TIMEOUT_MS, 10) || 120000;
 const MAX_BODY_SIZE = 4 * 1024 * 1024; // 4 MB (los prompts pueden ser largos)
 const ALLOW_LOCALHOST = process.env.ALLOW_LOCALHOST === '1';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+
+// Whitelist de archivos estaticos servidos: evita path traversal
+// (/../server.js, /.env...) y la exposicion de codigo no previsto.
+const STATIC_FILES = new Set(['/index.html', '/app.js', '/logo-fap.png']);
+
+// ============================================================
+//  RATE LIMIT del proxy (anti-abuso)
+//  Token bucket simple en memoria por IP: RL_MAX_REQS peticiones
+//  por RL_WINDOW_MS. Detras de un balanceador, la IP del cliente
+//  llega en X-Forwarded-For (la pone el propio hosting, no el
+//  navegador, por lo que es confiable en produccion).
+// ============================================================
+const RL_WINDOW_MS = 60000;
+const RL_MAX_REQS = 30;
+const rlBuckets = new Map();
+setInterval(function() {
+    const now = Date.now();
+    for (const [ip, rec] of rlBuckets) {
+        if (now - rec.start > RL_WINDOW_MS) rlBuckets.delete(ip);
+    }
+}, RL_WINDOW_MS).unref();
+
+function isRateLimited(ip) {
+    const now = Date.now();
+    let rec = rlBuckets.get(ip);
+    if (!rec || now - rec.start > RL_WINDOW_MS) {
+        rec = { count: 0, start: now };
+        rlBuckets.set(ip, rec);
+    }
+    rec.count++;
+    return rec.count > RL_MAX_REQS;
+}
+
+// ============================================================
+//  DNS REBINDING (Problema 1 - defensa en profundidad)
+//  Aunque la whitelist usa hostnames exactos, un atacante no
+//  puede rebindearlos (no controla el DNS de OpenAI/Gemini/etc),
+//  pero si el operador agrega hosts propios via SSRF_EXTRA_HOSTS
+//  si existe ese riesgo. secureLookup bloquea la conexion si el
+//  hostname resuelve a una IP privada/loopback/link-local.
+// ============================================================
+function isPrivateIp(addr) {
+    if (!addr) return true;
+    const a = String(addr).toLowerCase();
+    if (a.includes(':')) {
+        if (a === '::1' || a === '::') return true;
+        if (a.startsWith('fc') || a.startsWith('fd')) return true;      // fc00::/7 ULA
+        if (/^fe[89ab]/.test(a)) return true;                            // fe80::/10 link-local
+        if (a.startsWith('::ffff:')) return isPrivateIp(a.slice(7));     // IPv4 mapeada
+        return false;
+    }
+    const parts = a.split('.');
+    if (parts.length !== 4) return true;
+    const p = parts.map(Number);
+    if (p.some(function(n) { return isNaN(n); })) return true;
+    const b0 = p[0], b1 = p[1];
+    if (b0 === 0 || b0 === 10 || b0 === 127 || b0 >= 224) return true;
+    if (b0 === 169 && b1 === 254) return true;                           // link-local
+    if (b0 === 172 && b1 >= 16 && b1 <= 31) return true;                 // RFC1918
+    if (b0 === 192 && b1 === 168) return true;                           // RFC1918
+    if (b0 === 100 && b1 >= 64 && b1 <= 127) return true;                // CGNAT
+    return false;
+}
+
+function secureLookup(hostname, opts, cb) {
+    dns.lookup(hostname, opts, function(err, address, family) {
+        // Node puede pasar all:true en opts (address llega como array)
+        const addrList = Array.isArray(address)
+            ? address.map(function(a) { return a.address; })
+            : [address];
+        if (!err) {
+            for (let i = 0; i < addrList.length; i++) {
+                if (isPrivateIp(addrList[i])) {
+                    err = new Error('Resolucion bloqueada por seguridad: IP privada (' + addrList[i] + ')');
+                    err.code = 'EBLOCKED';
+                    address = undefined;
+                    family = undefined;
+                    break;
+                }
+            }
+        }
+        cb(err, address, family);
+    });
+}
 
 const MIME = {
     '.html': 'text/html; charset=utf-8',
@@ -141,25 +227,38 @@ function validateProxyUrl(rawUrl) {
 //  HELPERS
 // ============================================================
 function setCORS(res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-target-url, x-api-key');
 }
 
 function serveStatic(req, res) {
-    let filePath = req.url === '/' ? '/index.html' : req.url;
-    filePath = path.join(__dirname, filePath);
+    let pathname;
+    try {
+        pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    } catch (e) {
+        pathname = '/';
+    }
+    if (pathname === '/') pathname = '/index.html';
+    if (!STATIC_FILES.has(pathname)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Not found');
+        return;
+    }
 
+    const filePath = path.join(__dirname, pathname);
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME[ext] || 'application/octet-stream';
 
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
             res.end('Not found');
             return;
         }
         res.setHeader('Content-Type', contentType);
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('X-Frame-Options', 'DENY');
         res.writeHead(200);
         res.end(data);
     });
@@ -216,7 +315,8 @@ function proxyStreamRequest(targetUrl, method, headers, body, clientRes) {
         path: parsed.pathname + parsed.search,
         method: method,
         headers: headers,
-        timeout: UPSTREAM_TIMEOUT_MS
+        timeout: UPSTREAM_TIMEOUT_MS,
+        lookup: secureLookup  // anti DNS rebinding
     };
     if (body && body.length) {
         options.headers['Content-Length'] = body.length;
@@ -330,6 +430,15 @@ function proxyStreamRequest(targetUrl, method, headers, body, clientRes) {
 // ============================================================
 async function handleChatProxy(req, res) {
     try {
+        // Rate limit por IP de cliente
+        const clientIp = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+            req.socket.remoteAddress || 'unknown';
+        if (isRateLimited(clientIp)) {
+            res.writeHead(429, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end('Too many requests: limite de ' + RL_MAX_REQS + ' peticiones por minuto');
+            return;
+        }
+
         const parsedBody = await parseBody(req);
         if (parsedBody.overflow) {
             res.writeHead(413, { 'Content-Type': 'application/json' });
@@ -386,8 +495,19 @@ const server = http.createServer((req, res) => {
     const reqUrl = new URL(req.url, 'http://localhost');
     const pathname = reqUrl.pathname;
 
-    if (pathname === '/api/chat' && req.method === 'POST') {
-        return handleChatProxy(req, res);
+    if (pathname === '/api/chat') {
+        if (req.method === 'POST') {
+            return handleChatProxy(req, res);
+        }
+        res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Method not allowed');
+        return;
+    }
+
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+        res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Method not allowed');
+        return;
     }
 
     return serveStatic(req, res);
@@ -401,6 +521,9 @@ server.listen(PORT, () => {
     console.log('  Estaticos:   /');
     console.log('  Texto:       POST /api/chat');
     console.log('  SSRF:        whitelist de ' + ALLOWED_PROXY_HOSTS.size + ' dominios');
+    console.log('  DNS rebind:  bloqueo de IPs privadas en la conexion');
+    console.log('  Rate limit:  ' + RL_MAX_REQS + ' req/min por IP');
+    console.log('  CORS:        ' + CORS_ORIGIN);
     console.log('  Localhost:   ' + (ALLOW_LOCALHOST ? 'PERMITIDO (ALLOW_LOCALHOST=1)' : 'bloqueado (ALLOW_LOCALHOST=1 para Ollama)'));
     console.log('  Heartbeat:   cada ' + (HEARTBEAT_MS / 1000) + 's | Timeout upstream: ' + (UPSTREAM_TIMEOUT_MS / 1000) + 's');
     console.log('==========================================');
