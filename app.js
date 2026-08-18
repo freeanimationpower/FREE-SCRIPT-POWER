@@ -941,9 +941,14 @@ function callTextAPI(systemPrompt, userText, intento) {
     .then(function(resp) {
         const parsed = safeParseJSON(resp.text);
 
-        // 1) Sobre de error del proveedor (upstream_status)
+        // 1) Sobre de error del proveedor (proxy Node con upstream_status)
+        //    o error directo del proxy PHP (reusa el status HTTP real)
         if (parsed && parsed.error) {
-            return handleUpstreamError(parsed.error.upstream_status || 502, parsed.error.message || '');
+            const upStatus = parsed.error.upstream_status;
+            if (!upStatus && resp.status === 403) {
+                throw makeError('SSRF_BLOCKED', 'El servidor bloqueo la URL del proveedor (whitelist SSRF).');
+            }
+            return handleUpstreamError(upStatus || resp.status || 502, parsed.error.message || '');
         }
 
         // 2) El proxy respondio con un error NO-JSON (caida del proxy,
