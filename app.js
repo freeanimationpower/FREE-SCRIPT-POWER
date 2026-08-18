@@ -1598,29 +1598,53 @@ function exportPdf() {
         const INK = [7, 7, 6];
         const MUTED = [107, 101, 0];
 
-        // ---------- PORTADA ----------
-        if (logoData) doc.addImage(logoData, 'PNG', pageW / 2 - 45, 70, 90, 90);
+        // ---------- PORTADA (amarillo corporativo FAP) ----------
+        const YELLOW = [255, 220, 0];
+        doc.setFillColor(YELLOW[0], YELLOW[1], YELLOW[2]);
+        doc.rect(0, 0, pageW, pageH, 'F');
+        // franja superior negra
+        doc.setFillColor(INK[0], INK[1], INK[2]);
+        doc.rect(0, 0, pageW, 14, 'F');
+        // logo free script power (3:2)
+        if (logoData) doc.addImage(logoData, 'PNG', pageW / 2 - 100, 62, 200, 133);
+        // titulo de la app
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(30);
+        doc.setFontSize(34);
         doc.setTextColor(INK[0], INK[1], INK[2]);
-        doc.text('SCRIPT AI', pageW / 2, logoData ? 200 : 130, { align: 'center' });
-        doc.setFontSize(18);
-        const wrappedTitle = doc.splitTextToSize(title, pageW - 160);
-        doc.text(wrappedTitle, pageW / 2, logoData ? 240 : 160, { align: 'center' });
+        doc.text('SCRIPT AI', pageW / 2, logoData ? 264 : 150, { align: 'center' });
+        // titulo del guion
+        doc.setFontSize(19);
+        const wrappedTitle = doc.splitTextToSize(title, pageW - 140);
+        const titleY = logoData ? 300 : 180;
+        doc.text(wrappedTitle, pageW / 2, titleY, { align: 'center' });
+        const titleEndY = titleY + (wrappedTitle.length - 1) * 24;
+        // separador
+        const dividerY = Math.max(titleEndY + 34, 400);
+        doc.setDrawColor(INK[0], INK[1], INK[2]);
+        doc.setLineWidth(1.2);
+        doc.line(pageW / 2 - 120, dividerY, pageW / 2 + 120, dividerY);
+        doc.setFillColor(INK[0], INK[1], INK[2]);
+        doc.circle(pageW / 2, dividerY, 2.5, 'F');
+        // metadatos
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(11);
         doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-        doc.text(currentLang === 'en' ? 'AI-generated screenplay' : 'Guion generado con IA', pageW / 2, 300, { align: 'center' });
-        doc.text(formatTime(Date.now()), pageW / 2, 316, { align: 'center' });
-        // logos de marca abajo (freeanimationpower.org + fierroduque.com)
-        doc.setTextColor(INK[0], INK[1], INK[2]);
+        doc.text(currentLang === 'en' ? 'AI-generated screenplay' : 'Guion generado con IA', pageW / 2, dividerY + 26, { align: 'center' });
+        doc.text(formatTime(Date.now()), pageW / 2, dividerY + 44, { align: 'center' });
+        // banda inferior negra con marca
+        const bandH = 72;
+        doc.setFillColor(INK[0], INK[1], INK[2]);
+        doc.rect(0, pageH - bandH, pageW, bandH, 'F');
+        doc.setFillColor(YELLOW[0], YELLOW[1], YELLOW[2]);
+        doc.rect(0, pageH - bandH, pageW, 4, 'F');
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
-        if (logoData) {
-            doc.addImage(logoData, 'PNG', pageW / 2 - 108, pageH - 158, 34, 34);
-            doc.addImage(logoData, 'PNG', pageW / 2 + 74, pageH - 158, 34, 34);
-        }
-        doc.text('freeanimationpower.org', pageW / 2 - 60, pageH - 110, { align: 'center' });
-        doc.text('fierroduque.com', pageW / 2 + 110, pageH - 110, { align: 'center' });
+        doc.setTextColor(255, 255, 255);
+        doc.text('freeanimationpower.org', pageW / 2 - 110, pageH - 40, { align: 'center' });
+        doc.text('fierroduque.com', pageW / 2 + 110, pageH - 40, { align: 'center' });
+        doc.setFontSize(9);
+        doc.setTextColor(YELLOW[0], YELLOW[1], YELLOW[2]);
+        doc.text('FREE SCRIPT POWER', pageW / 2, pageH - 20, { align: 'center' });
         doc.addPage();
 
         // ---------- CUERPO CON FORMATO DE GUION ----------
@@ -1696,9 +1720,9 @@ function exportPdf() {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(INK[0], INK[1], INK[2]);
-            doc.text('freeanimationpower.org  ·  fierroduque.com', pageW / 2, pageH - 28, { align: 'center' });
+            doc.text('freeanimationpower.org  ·  fierroduque.com', pageW / 2, pageH - 30, { align: 'center' });
             if (logoData) {
-                doc.addImage(logoData, 'PNG', pageW / 2 - 7, pageH - 21, 14, 14);
+                doc.addImage(logoData, 'PNG', pageW / 2 - 10.5, pageH - 24, 21, 14);
             }
             doc.restoreGraphicsState();
         }
