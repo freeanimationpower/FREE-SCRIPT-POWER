@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script AI — Guionista con IA | Free Animation Power</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        :root {
+            --yellow:    #ffdc00;
+            --yellow2:   #ffe94d;
+            --yellow3:   #ffe066;
+            --yellow4:   #fff3b3;
+            --ink:       #070706;
+            --ink2:      #1a1a1a;
+            --ink3:      #333333;
+            --white:     #ffffff;
+            --cream:     #fefcf0;
+            --warm:      #faf6e8;
+            --border:    #ede4c0;
+            --border2:   #e8dca0;
+            --muted:     #6b6500;
+            --muted2:    #938c00;
+            --orange:    #ff4200;
+            --error:     #cc2200;
+            --success:   #1a7730;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { background: var(--yellow); }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--yellow);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .display {
+            font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+        .card-board {
+            background: var(--white);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(7,7,6,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+        }
+
+        .accent-stripe { height: 6px; background: var(--orange); }
+
+        .logo-header { width: 36px; height: 36px; border-radius: 8px; }
+
+        .title-film {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+
+        .desc-film {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .subtitle-film {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+            margin-top: 3px;
+        }
+
+        .label-film {
+            display: block;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .input-film {
+            width: 100%;
+            background: var(--warm);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--ink);
+            resize: none;
+            line-height: 1.65;
+            transition: all 0.2s var(--ease-out-expo);
+            outline: none;
+        }
+
+        .input-film::placeholder { color: var(--muted2); font-family: 'JetBrains Mono', monospace; }
+        .input-film:focus { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(7,7,6,0.05); }
+        .input-film:disabled { opacity: 0.45; cursor: not-allowed; background: #f5f2e0; }
+
+        .btn-film {
+            width: 100%;
+            background: var(--ink);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 28px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--orange);
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: all 0.2s var(--ease-out-expo);
+        }
+
+        .btn-film:hover { background: var(--ink2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(7,7,6,0.12); }
+        .btn-film:active { transform: translateY(0); background: var(--ink); }
+        .btn-film:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        .loader-film {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: var(--warm);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+        }
+
+        .loader-prog {
+            width: 100px;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .loader-prog-fill {
+            height: 100%;
+            background: var(--orange);
+            border-radius: 2px;
+            animation: glide 2s ease-in-out infinite;
+            width: 0%;
+        }
+
+        @keyframes glide {
+            0% { width: 0%; margin-left: 0; }
+            40% { width: 45%; margin-left: 0; }
+            60% { width: 25%; margin-left: 75%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+
+        .divider-film { height: 1px; background: var(--border); margin: 14px 0; }
+        .footer-film { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.03em; }
+
+        /* ===== CONFIG PANEL ===== */
+        .config-toggle {
+            width: 100%;
+            background: var(--orange);
+            border: 1.5px solid var(--orange);
+            border-radius: 14px;
+            padding: 10px 18px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--ink);
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: all 0.2s var(--ease-out-expo);
+            margin-bottom: 6px;
+        }
+
+        .config-toggle:hover { background: #e83a00; border-color: #e83a00; }
+
+        .config-panel {
+            background: var(--warm);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .config-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--orange);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .select-film {
+            width: 100%;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 11px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--ink);
+            cursor: pointer;
+            transition: border-color 0.2s var(--ease-out-expo);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b6500' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            outline: none;
+        }
+
+        .select-film:focus { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(7,7,6,0.05); }
+
+        .btn-config {
+            padding: 9px 20px;
+            border-radius: 50px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            letter-spacing: 0.02em;
+            background: var(--orange);
+            color: var(--ink);
+            border: none;
+        }
+
+        .btn-config:hover { background: #e83a00; }
+        .config-status { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 600; }
+
+        /* ===== CHIPS DE FORMATO ===== */
+        .format-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink3);
+            cursor: pointer;
+            transition: all 0.18s var(--ease-out-expo);
+            user-select: none;
+        }
+
+        .format-chip:hover { border-color: var(--ink); }
+
+        .format-chip.active-format {
+            background: var(--ink);
+            color: var(--orange);
+            border-color: var(--ink);
+            font-weight: 800;
+        }
+
+        /* ===== EDITOR DE GUION ===== */
+        .script-editor {
+            width: 100%;
+            min-height: 480px;
+            background: var(--cream);
+            border: 1.5px solid var(--border2);
+            border-radius: 16px;
+            padding: 22px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.75;
+            color: var(--ink);
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s var(--ease-out-expo);
+            tab-size: 4;
+        }
+
+        .script-editor:focus { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(7,7,6,0.05); }
+
+        .toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 50px;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            color: var(--ink);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s var(--ease-out-expo);
+        }
+
+        .toolbar-btn:hover { border-color: var(--ink); transform: translateY(-1px); }
+        .toolbar-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+        .toolbar-btn.toolbar-primary { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+        .toolbar-btn.toolbar-primary:hover { background: #e83a00; }
+
+        .selection-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--success);
+            background: #eaf6ee;
+            border: 1px solid #bfe3ca;
+            padding: 4px 10px;
+            border-radius: 50px;
+        }
+
+        .selection-badge.empty { color: var(--muted); background: var(--warm); border-color: var(--border); }
+
+        .correction-item {
+            background: var(--warm);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 11px;
+        }
+
+        .correction-item .ci-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .correction-item .ci-inst {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .correction-item .ci-meta {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .correction-item .ci-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .ci-btn {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--ink);
+            transition: all 0.15s var(--ease-out-expo);
+        }
+
+        .ci-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: var(--warm);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: all 0.15s var(--ease-out-expo);
+        }
+
+        .project-item:hover { border-color: var(--ink); }
+
+        .project-item .pj-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .project-item .pj-meta { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+        /* ===== LANGUAGE SWITCHER ===== */
+        .lang-switch {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 10;
+            display: flex;
+            gap: 3px;
+        }
+
+        .lang-btn {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            color: var(--ink);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            padding: 6px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .lang-btn:hover { border-color: var(--orange); color: var(--orange); }
+        .lang-btn.active-lang { background: var(--orange); color: var(--ink); border-color: var(--orange); font-weight: 800; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .title-film { font-size: 20px; }
+            .desc-film { font-size: 12px; }
+            .subtitle-film { font-size: 11px; }
+            .input-film { font-size: 11px; padding: 12px 14px; }
+            .btn-film { font-size: 12px; padding: 13px 22px; }
+            .select-film { font-size: 11px; padding: 10px 12px; }
+            .config-panel { padding: 14px; }
+            .script-editor { font-size: 12px; padding: 16px; min-height: 380px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 8px; }
+            .title-film { font-size: 18px; }
+            .desc-film { font-size: 11px; line-height: 1.55; }
+            .subtitle-film { font-size: 10px; }
+            .input-film { font-size: 11px; padding: 11px 12px; border-radius: 12px; }
+            .btn-film { font-size: 12px; padding: 12px 18px; }
+            .select-film { font-size: 11px; padding: 10px 12px; border-radius: 12px; }
+            .config-panel { padding: 12px; border-radius: 14px; }
+            .config-toggle { font-size: 10px; padding: 9px 14px; }
+            .btn-config { font-size: 9px; padding: 7px 12px; }
+            .label-film { font-size: 8px; margin-bottom: 4px; }
+            .card-board { border-radius: 16px; }
+            .logo-header { width: 30px; height: 30px; border-radius: 6px; }
+            .format-chip { font-size: 10px; padding: 7px 11px; }
+            .script-editor { font-size: 11px; padding: 14px; min-height: 320px; }
+            .toolbar-btn { font-size: 10px; padding: 8px 12px; }
+            .lang-switch { top: 8px; right: 8px; flex-wrap: wrap; justify-content: flex-end; }
+            .lang-btn { font-size: 9px; padding: 4px 9px; }
+            .loader-film { flex-direction: column; gap: 8px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6 font-body">
+
+    <main class="w-full max-w-3xl mx-auto">
+
+        <div class="card-board" style="position:relative;">
+
+            <div class="accent-stripe"></div>
+
+            <div class="lang-switch" id="langSwitch">
+                <button class="lang-btn" data-lang="en" data-i18n-title="lang_tooltip">EN</button>
+                <button class="lang-btn active-lang" data-lang="es" data-i18n-title="lang_tooltip">ES</button>
+            </div>
+
+            <div class="p-6 sm:p-10">
+
+                <header class="mb-5">
+                    <div class="flex items-start gap-3 mb-3">
+                        <img src="logo-fap.png" alt="FAP" class="logo-header">
+                        <h1 class="title-film">
+                            Script AI
+                            <span class="subtitle-film" data-i18n="subtitle">Guionista con IA — by Free Animation Power / fierroduque.com</span>
+                        </h1>
+                    </div>
+                    <div class="divider-film"></div>
+                    <p class="desc-film" data-i18n="desc">
+                        Escribe tu idea, elige el formato (animacion, ficcion, documental, YouTube...) y genera un guion narrativo completo. Editalo en pantalla y corrige solo las partes que quieras con instrucciones en lenguaje natural.
+                    </p>
+                </header>
+
+                <!-- ===== PANEL DE CONFIGURACION ===== -->
+                <button id="showConfigBtn" class="config-toggle" type="button" data-i18n="config_apis">
+                    Configurar APIs
+                </button>
+
+                <div id="configPanel" class="config-panel hidden">
+                    <div class="config-section-title" data-i18n="api_text">API de Texto</div>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="textProvider" class="label-film" data-i18n="provider">Proveedor</label>
+                            <select id="textProvider" class="select-film"></select>
+                        </div>
+                        <div>
+                            <label for="textApiKey" class="label-film" data-i18n="api_key">API Key</label>
+                            <input type="password" id="textApiKey" class="input-film" placeholder="sk-...">
+                        </div>
+                        <div>
+                            <label for="textModel" class="label-film" data-i18n="model">Modelo</label>
+                            <input type="text" id="textModel" class="input-film" placeholder="gpt-4o">
+                        </div>
+                        <div>
+                            <label for="textUrl" class="label-film" data-i18n="url_base">URL Base</label>
+                            <input type="text" id="textUrl" class="input-film" placeholder="https://api.openai.com/v1/chat/completions">
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
+                        <button id="saveConfigBtn" class="btn-config" type="button" data-i18n="save_config">Guardar configuracion</button>
+                        <button id="clearConfigBtn" class="btn-config" type="button" data-i18n="clear">Limpiar</button>
+                        <span id="configStatus" class="config-status" style="margin-left:auto;"></span>
+                    </div>
+                </div>
+
+                <!-- ===== FORMULARIO DE PARAMETROS ===== -->
+                <div style="margin-top:2px;">
+                    <div>
+                        <label for="ideaInput" class="label-film" data-i18n="idea_label">Idea / premisa</label>
+                        <textarea id="ideaInput" rows="4" class="input-film" data-i18n="idea_placeholder" placeholder="Ej: Una nina robot descubre un jardin secreto en una ciudad gris y decide defenderlo de las excavadoras..."></textarea>
+                    </div>
+
+                    <div style="margin-top:14px;">
+                        <span class="label-film" data-i18n="format_label">Formato</span>
+                        <div id="formatChips" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3" style="margin-top:14px;">
+                        <div>
+                            <label for="genreInput" class="label-film" data-i18n="genre">Genero</label>
+                            <input type="text" id="genreInput" class="input-film" data-i18n="genre_placeholder" placeholder="Ej: comedia, drama, sci-fi...">
+                        </div>
+                        <div>
+                            <label for="durationInput" class="label-film" data-i18n="duration">Duracion</label>
+                            <input type="text" id="durationInput" class="input-film" data-i18n="duration_placeholder" placeholder="Ej: 10 min / 3 paginas / 1 video">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3" style="margin-top:12px;">
+                        <div>
+                            <label for="toneInput" class="label-film" data-i18n="tone">Tono</label>
+                            <input type="text" id="toneInput" class="input-film" data-i18n="tone_placeholder" placeholder="Ej: epico, ironico, tierno...">
+                        </div>
+                        <div>
+                            <label for="audienceInput" class="label-film" data-i18n="audience">Audiencia</label>
+                            <input type="text" id="audienceInput" class="input-film" data-i18n="audience_placeholder" placeholder="Ej: ninos 6-10, todo publico...">
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <label for="charactersInput" class="label-film" data-i18n="characters">Personajes / extras (opcional)</label>
+                        <textarea id="charactersInput" rows="2" class="input-film" data-i18n="characters_placeholder" placeholder="Ej: LIA (robot nina, curiosa) / ABUELO JOSE (jardinero retirado) / DOGMA (perro robot)..."></textarea>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <label for="scriptLang" class="label-film" data-i18n="script_lang">Idioma del guion</label>
+                        <select id="scriptLang" class="select-film">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <button id="generateBtn" type="button" class="btn-film" style="margin-top:16px;">
+                        <span class="flex items-center justify-center gap-2.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <span data-i18n="generate_btn">Generar guion</span>
+                        </span>
+                    </button>
+                </div>
+
+                <div id="loader" class="hidden mt-5">
+                    <div class="loader-film">
+                        <div class="loader-prog">
+                            <div class="loader-prog-fill"></div>
+                        </div>
+                        <span id="statusText" style="color:var(--muted);font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;" data-i18n="processing">
+                            Generando guion...
+                        </span>
+                    </div>
+                </div>
+
+                <!-- ===== RESULTADO: EDITOR ===== -->
+                <div id="resultSection" class="hidden mt-6">
+                    <div class="divider-film"></div>
+
+                    <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+                        <h2 class="display" style="font-size:16px;font-weight:800;" data-i18n="script_result">Guion generado (editable)</h2>
+                        <span id="wordCount" class="selection-badge empty">0</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-3" id="toolbar">
+                        <button id="saveProjectBtn" class="toolbar-btn" type="button" data-i18n="save_project">Guardar proyecto</button>
+                        <button id="copyBtn" class="toolbar-btn" type="button" data-i18n="copy">Copiar</button>
+                        <button id="downloadTxtBtn" class="toolbar-btn" type="button" data-i18n="download_txt">.txt</button>
+                        <button id="downloadFountainBtn" class="toolbar-btn" type="button" data-i18n="download_fountain">.fountain</button>
+                        <button id="downloadWordBtn" class="toolbar-btn" type="button" data-i18n="download_word">Word</button>
+                        <button id="downloadPdfBtn" class="toolbar-btn" type="button" data-i18n="download_pdf">PDF</button>
+                        <button id="newScriptBtn" class="toolbar-btn toolbar-primary" type="button" data-i18n="new_script">+ Nuevo guion</button>
+                    </div>
+
+                    <textarea id="scriptEditor" class="script-editor" spellcheck="false" data-i18n="editor_placeholder" placeholder="El guion aparecera aqui..."></textarea>
+
+                    <!-- ===== CORRECCION IA ===== -->
+                    <div class="config-panel mt-4" style="margin-bottom:0;">
+                        <div class="config-section-title" data-i18n="ai_fix_title">Correccion inteligente (IA)</div>
+
+                        <div style="margin-bottom:10px;">
+                            <span class="label-film" style="display:inline;margin-right:8px;" data-i18n="fix_scope">Alcance:</span>
+                            <span id="selectionBadge" class="selection-badge empty" data-i18n="no_selection">Sin seleccion — selecciona texto en el editor</span>
+                            <button id="clearSelectionBtn" class="ci-btn hidden" type="button" data-i18n="clear_selection">Quitar seleccion</button>
+                        </div>
+
+                        <div style="margin-bottom:10px;">
+                            <label for="fixTargetInput" class="label-film" data-i18n="fix_target">O indicar escenas (si no usas seleccion)</label>
+                            <input type="text" id="fixTargetInput" class="input-film" data-i18n="fix_target_placeholder" placeholder="Ej: ESCENA 2 / ESCENAS 1-3 / ESCENA 5 DIÁLOGO / TODO">
+                        </div>
+
+                        <div style="margin-bottom:12px;">
+                            <label for="fixInstructionInput" class="label-film" data-i18n="fix_instruction">Instruccion de correccion</label>
+                            <textarea id="fixInstructionInput" rows="2" class="input-film" data-i18n="fix_instruction_placeholder" placeholder="Ej: haz este dialogo mas comico y mas corto / cambia el final a uno feliz / anade un giro dramatico"></textarea>
+                        </div>
+
+                        <button id="fixBtn" type="button" class="btn-film" data-i18n="fix_btn">
+                            Corregir con IA
+                        </button>
+                        <div id="fixStatus" class="config-status mt-2" style="display:none;"></div>
+                    </div>
+
+                    <!-- ===== HISTORIAL DE CORRECCIONES ===== -->
+                    <div class="config-panel mt-4" style="margin-bottom:0;" id="historyPanel">
+                        <div class="config-section-title" data-i18n="fix_history">Historial de correcciones</div>
+                        <div id="historyList"></div>
+                        <button id="undoFixBtn" class="ci-btn hidden" type="button" data-i18n="undo_last">Deshacer ultima correccion</button>
+                    </div>
+                </div>
+
+                <!-- ===== PROYECTOS GUARDADOS ===== -->
+                <div id="projectsSection" class="mt-6">
+                    <div class="divider-film"></div>
+                    <h2 class="display mb-3" style="font-size:16px;font-weight:800;" data-i18n="saved_projects">Proyectos guardados</h2>
+                    <div id="projectsList"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <footer class="mt-6 text-center">
+            <p class="footer-film">
+                <strong>Script AI</strong> — Free Animation Power &middot; <span data-i18n="footer">Las API keys se guardan solo en tu navegador (localStorage).</span>
+            </p>
+        </footer>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
