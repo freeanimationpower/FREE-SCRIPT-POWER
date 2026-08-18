@@ -1,3 +1,7 @@
+<img width="1536" height="1024" alt="free script power" src="https://github.com/user-attachments/assets/3f65aa18-79cc-4aba-b7f8-f9e7b055b72e" />
+
+
+
 # FREE SCRIPT POWER — Guionista con IA
 
 > **By FAP / fierroduque.com** — Parte del ecosistema [Free Animation Power](https://freeanimationpower.org).
