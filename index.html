@@ -472,24 +472,28 @@
 
         @media (max-width: 480px) {
             body { padding: 8px; }
+            header { padding-right: 64px; }
             .title-film { font-size: 18px; }
             .desc-film { font-size: 11px; line-height: 1.55; }
             .subtitle-film { font-size: 10px; }
-            .input-film { font-size: 11px; padding: 11px 12px; border-radius: 12px; }
-            .btn-film { font-size: 12px; padding: 12px 18px; }
-            .select-film { font-size: 11px; padding: 10px 12px; border-radius: 12px; }
+            .input-film, .select-film { font-size: 16px; padding: 12px 14px; border-radius: 12px; }
+            .btn-film { font-size: 12px; padding: 14px 18px; }
+            .select-film { padding: 12px 14px; border-radius: 12px; }
             .config-panel { padding: 12px; border-radius: 14px; }
-            .config-toggle { font-size: 10px; padding: 9px 14px; }
-            .btn-config { font-size: 9px; padding: 7px 12px; }
+            .config-toggle { font-size: 10px; padding: 10px 14px; }
+            .btn-config { font-size: 10px; padding: 9px 14px; }
             .label-film { font-size: 8px; margin-bottom: 4px; }
             .card-board { border-radius: 16px; }
             .logo-header { width: 45px; height: 30px; border-radius: 5px; object-fit: contain; }
-            .format-chip { font-size: 10px; padding: 7px 11px; }
-            .script-editor { font-size: 11px; padding: 14px; min-height: 320px; }
-            .toolbar-btn { font-size: 10px; padding: 8px 12px; }
+            .format-chip { font-size: 10px; padding: 8px 12px; }
+            .script-editor { font-size: 16px; padding: 14px; min-height: 320px; resize: none; }
+            .toolbar-btn { font-size: 10px; padding: 10px 14px; }
+            .ci-btn { font-size: 10px; padding: 6px 12px; }
             .lang-switch { top: 8px; right: 8px; flex-wrap: wrap; justify-content: flex-end; }
-            .lang-btn { font-size: 9px; padding: 4px 9px; }
+            .lang-btn { font-size: 9px; padding: 6px 10px; }
             .loader-film { flex-direction: column; gap: 8px; align-items: flex-start; }
+            .correction-item .ci-head { flex-wrap: wrap; }
+            .project-item { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -567,7 +571,7 @@
                         <div id="formatChips" class="flex flex-wrap gap-2"></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3" style="margin-top:14px;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" style="margin-top:14px;">
                         <div>
                             <label for="genreInput" class="label-film" data-i18n="genre">Genero</label>
                             <input type="text" id="genreInput" class="input-film" data-i18n="genre_placeholder" placeholder="Ej: comedia, drama, sci-fi...">
@@ -578,7 +582,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3" style="margin-top:12px;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" style="margin-top:12px;">
                         <div>
                             <label for="toneInput" class="label-film" data-i18n="tone">Tono</label>
                             <input type="text" id="toneInput" class="input-film" data-i18n="tone_placeholder" placeholder="Ej: epico, ironico, tierno...">
