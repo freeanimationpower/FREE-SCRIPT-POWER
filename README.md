@@ -3,8 +3,25 @@
 
 
 # FREE SCRIPT POWER — Guionista con IA
+<p align="center">
+  <a href="https://freeanimationpower.org"><img src="https://img.shields.io/badge/Web_Hub-freeanimationpower.org-ffdc00?style=for-the-badge" alt="Web Hub"></a>
+  <a href="https://www.youtube.com/@freeanimationpower"><img src="https://img.shields.io/badge/YouTube-@freeanimationpower-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
+  <a href="https://github.com/freeanimationpower"><img src="https://img.shields.io/badge/GitHub-freeanimationpower-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+</p>
 
-> **By FAP / fierroduque.com** — Parte del ecosistema [Free Animation Power](https://freeanimationpower.org).
+<p align="center">
+  <img src="docs/screenshot.png" alt="Free Script Power — generador de guiones con IA" width="860">
+</p>
+
+## 🎬 Videos
+
+📺 Canal oficial: [@freeanimationpower](https://www.youtube.com/@freeanimationpower)
+
+| Vídeo | Título |
+|---|---|
+| <a href="https://youtu.be/S_pCivQknvQ"><img src="https://i.ytimg.com/vi/S_pCivQknvQ/hqdefault.jpg" width="240"></a> | [Vídeo general: en qué dispositivos funciona Free Animation Power](https://youtu.be/S_pCivQknvQ) |
+
+> **By Free Animation Power / fierroduque.com** — Parte del ecosistema [Free Animation Power](https://freeanimationpower.org).
 
 Aplicacion web que convierte una **idea + parametros creativos** en un **guion narrativo completo en formato de guion profesional**, usando inteligencia artificial multi-proveedor. El resultado se muestra en un **editor en pantalla** donde puedes:
 
@@ -14,13 +31,13 @@ Aplicacion web que convierte una **idea + parametros creativos** en un **guion n
 
 Arquitectura multi-proveedor: el usuario conecta su **propia API key** del servicio que prefiera (OpenAI, Gemini, Mistral, DeepSeek, Groq, OpenRouter...), sin depender de un unico modelo. Hay proveedores **gratuitos** y **de pago**.
 
-Parte del ecosistema **Free Animation Power (FAP)** junto con:
+Parte del ecosistema **Free Animation Power** junto con:
 
-- [FAP Web Hub](https://freeanimationpower.org) — Landing page oficial con todas las herramientas
-- [FAP Desktop](https://github.com/freeanimationpower/FAP_PC_WEB_VERSION) — Estudio de animacion 2D para PC
-- [FAP Mobile](https://github.com/freeanimationpower/FAP_MOBILE_WEB_VERSION) — Estudio de animacion 2D para moviles
-- [FAP AI Storyboard WEB](https://github.com/freeanimationpower/FAP_AI_STORYBOARD_WEB) — Generador de storyboards con IA
-- [FAP Desktop App](https://github.com/freeanimationpower/FreeAnimationPower) — Aplicacion nativa Windows (C++20/Qt 6)
+- [Free Animation Power Web Hub](https://freeanimationpower.org) — Landing page oficial con todas las herramientas
+- [Free Animation Power Desktop](https://github.com/freeanimationpower/FAP_PC_WEB_VERSION) — Estudio de animacion 2D para PC
+- [Free Animation Power Mobile](https://github.com/freeanimationpower/FAP_MOBILE_WEB_VERSION) — Estudio de animacion 2D para moviles
+- [Free Animation Power AI Storyboard WEB](https://github.com/freeanimationpower/FAP_AI_STORYBOARD_WEB) — Generador de storyboards con IA
+- [Free Animation Power Desktop App](https://github.com/freeanimationpower/FreeAnimationPower) — Aplicacion nativa Windows (C++20/Qt 6)
 
 ---
 
@@ -215,7 +232,7 @@ La app clasifica cada linea y le da el tratamiento profesional estandar:
 
 ### Portada y marca de agua (PDF)
 
-- **Portada**: logo FAP, "SCRIPT AI", titulo del guion, fecha y los logos con **freeanimationpower.org** y **fierroduque.com** al pie.
+- **Portada**: logo Free Animation Power, "SCRIPT AI", titulo del guion, fecha y los logos con **freeanimationpower.org** y **fierroduque.com** al pie.
 - **Marca de agua**: en cada pagina, al pie, los logos y URLs semitransparentes (opacidad 7%).
 - El Word incluye su propia portada con salto de pagina.
 
@@ -269,7 +286,7 @@ La app clasifica cada linea y le da el tratamiento profesional estandar:
 ```
 
 - **Frontend**: HTML5 + Tailwind CSS (CDN) + JavaScript Vanilla. Sin build, sin dependencias npm.
-- **Tema visual**: FAP corporativo — fondo amarillo `#ffdc00`, cards blancas, acento naranja `#ff4200`, fuentes Outfit + Plus Jakarta Sans + JetBrains Mono.
+- **Tema visual**: Free Animation Power corporativo — fondo amarillo `#ffdc00`, cards blancas, acento naranja `#ff4200`, fuentes Outfit + Plus Jakarta Sans + JetBrains Mono.
 - **Servidor**: Node.js puro — estaticos + proxy de texto `/api/chat`.
 - **Exportacion**: jsPDF + JSZip (CDN) — empaquetado 100% en el navegador.
 - **2 formatos de conector**: (A) OpenAI-compatible con `Authorization: Bearer` para 10 proveedores; (B) Gemini nativo con la key en query param y prompt en `system_instruction.parts`.
@@ -403,7 +420,7 @@ Secciones principales de `app.js`: `I18N` (ES/EN) · `TEXT_PROVIDERS` (11 conect
 
 ## Licencia
 
-© Todos los derechos reservados. Free Animation Power (FAP) por Eduardo Fierro Duque.
+© Todos los derechos reservados. Free Animation Power por Eduardo Fierro Duque.
 
 - [freeanimationpower.org](https://freeanimationpower.org)
 - [fierroduque.com](https://www.fierroduque.com)
