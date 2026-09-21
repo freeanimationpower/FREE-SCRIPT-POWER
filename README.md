@@ -63,6 +63,25 @@ Parte del ecosistema **Free Animation Power** junto con:
 
 ## Caracteristicas
 
+```mermaid
+flowchart LR
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ffdc00', 'primaryBorderColor': '#1a1a1a', 'primaryTextColor': '#1a1a1a', 'lineColor': '#ff4200', 'fontFamily': 'Segoe UI'}}}%%
+    classDef ui fill:#ffdc00,stroke:#1a1a1a,color:#1a1a1a,stroke-width:2px;
+    classDef engine fill:#ff4200,stroke:#1a1a1a,color:#ffffff,stroke-width:2px;
+    classDef data fill:#1a1a1a,stroke:#ff4200,color:#ffffff,stroke-width:2px;
+    classDef ext fill:#ffffff,stroke:#1a1a1a,color:#1a1a1a,stroke-width:2px,stroke-dasharray:6 3;
+        IDEA["💡 Idea de partida<br/>una frase basta"] --> FMT["📋 Formato — 12 opciones<br/>cine · YouTube · podcast · teatro<br/>publicidad · series · y más"]
+        FMT --> PRM["🧩 Constructor de prompt<br/>estructura profesional forzada<br/>+ parámetros de tono y extensión"]
+        PRM --> API["🤖 API de IA configurable<br/>trae tu propia key"]
+        API --> EDT["✏️ Editor de guion<br/>edición libre por escenas"]
+        EDT --> FIX["🔧 Corrección inteligente<br/>por notas del director o 2ª IA"]
+        FIX --> OUT["📤 Exportar<br/>Markdown / TXT / copiar"]
+        class IDEA,FMT ui
+        class PRM,API engine
+        class EDT,FIX data
+        class OUT ext
+```
+
 - **12 formatos de guion** con estructura profesional forzada por prompt: Animacion 2D, Animacion 3D, Cortometraje, Largometraje, Documental, YouTube, Podcast, Teatro, Videojuego, Publicidad, TikTok/Reels/Shorts y Serie.
 - **Parametros creativos**: idea, formato, genero, duracion, tono, audiencia, personajes e idioma del guion (espanol / ingles).
 - **Editor en pantalla**: el guion generado es 100% editable antes de exportar.
