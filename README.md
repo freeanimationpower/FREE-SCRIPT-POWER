@@ -26,7 +26,7 @@
 Aplicación web que convierte una **idea + parámetros creativos** en un **guion narrativo completo en formato de guion profesional**, usando inteligencia artificial multi-proveedor. El resultado se muestra en un **editor en pantalla** donde puedes:
 
 - **Editar el texto** directamente.
-- **Seleccionar cualquier parte** (o indicar escenas) y pedir una **corrección automática con IA** escribiendo una instrucción en lenguaje natural: *"haz este dialogo mas comico"*, *"cambia el final a uno feliz"*...
+- **Seleccionar cualquier parte** (o indicar escenas) y pedir una **corrección automática con IA** escribiendo una instrucción en lenguaje natural: *"haz este diálogo mas comico"*, *"cambia el final a uno feliz"*...
 - Deshacer correcciones, guardar proyectos y exportar a `.txt`, `.fountain`, `.docx` (Word) o `PDF` con **formato de guion profesional** y **portada con marca de agua**.
 
 Arquitectura multi-proveedor: el usuario conecta su **propia API key** del servicio que prefiera (OpenAI, Gemini, Mistral, DeepSeek, Groq, OpenRouter...), sin depender de un único modelo. Hay proveedores **gratuitos** y **de pago**.
@@ -45,7 +45,7 @@ Parte del ecosistema **Free Animation Power** junto con:
 
 1. [Características](#características)
 2. [Inicio rápido](#inicio-rápido)
-3. [Guia de uso paso a paso](#guia-de-uso-paso-a-paso)
+3. [Guía de uso paso a paso](#guía-de-uso-paso-a-paso)
 4. [Los 12 formatos de guion](#los-12-formatos-de-guion)
 5. [Corrección inteligente](#corrección-inteligente)
 6. [Proyectos guardados](#proyectos-guardados)
@@ -82,7 +82,7 @@ flowchart LR
 ```
 
 - **12 formatos de guion** con estructura profesional forzada por prompt: Animación 2D, Animación 3D, Cortometraje, Largometraje, Documental, YouTube, Podcast, Teatro, Videojuego, Publicidad, TikTok/Reels/Shorts y Serie.
-- **Parámetros creativos**: idea, formato, genero, duracion, tono, audiencia, personajes e idioma del guion (espanol / ingles).
+- **Parámetros creativos**: idea, formato, género, duración, tono, audiencia, personajes e idioma del guion (espanol / ingles).
 - **Editor en pantalla**: el guion generado es 100% editable antes de exportar.
 - **Corrección inteligente por selección**: selecciona un fragmento con el raton (o escribe `ESCENA 2`, `ESCENAS 1-3`, `ACTO IV`, `TODO`) + una instrucción → la IA devuelve **solo esa parte corregida**, el resto del guion queda intacto.
 - **Historial de correcciones** con deshacer.
@@ -119,11 +119,11 @@ Click en "Configurar APIs" > elegir proveedor > pegar API key > Guardar
 
 ---
 
-## Guia de uso paso a paso
+## Guía de uso paso a paso
 
 ### 1. Configurar la API
 
-Abre **"Configurar APIs"** (boton naranja). El panel permite:
+Abre **"Configurar APIs"** (botón naranja). El panel permite:
 
 | Campo | Descripción |
 |---|---|
@@ -132,13 +132,13 @@ Abre **"Configurar APIs"** (boton naranja). El panel permite:
 | **Modelo** | Se rellena automaticamente al elegir proveedor. Puedes cambiarlo (ej. `gemini-2.0-flash` → `gemini-2.5-pro`) |
 | **URL Base** | Se rellena automaticamente. Solo editable en "Personalizado" (ej. Ollama local) |
 
-Pulsa **Guardar configuración**. Guia completa para obtener keys gratuitas y de pago: [`MANUAL_APIS.md`](MANUAL_APIS.md).
+Pulsa **Guardar configuración**. Guía completa para obtener keys gratuitas y de pago: [`MANUAL_APIS.md`](MANUAL_APIS.md).
 
 ### 2. Crear el guion
 
 - **Idea / premisa**: describe la historia en 1-4 lineas.
 - **Formato**: elige uno de los 12 chips (ver sección siguiente).
-- **Genero, duracion, tono, audiencia**: parámetros opcionales que la IA incorpora al guion.
+- **Género, duración, tono, audiencia**: parámetros opcionales que la IA incorpora al guion.
 - **Personajes**: opcional, con el formato `NOMBRE (descripcion)`.
 - **Idioma del guion**: Espanol o English (independiente del idioma de la interfaz).
 
@@ -146,7 +146,7 @@ Pulsa **Generar guion**. La IA responde con el guion completo en el editor.
 
 ### 3. Editar
 
-El editor es un area de texto libre: puedes corregir palabras, reescribir dialogos, borrar escenas... El contador de palabras se actualiza en vivo.
+El editor es un area de texto libre: puedes corregir palabras, reescribir diálogos, borrar escenas... El contador de palabras se actualiza en vivo.
 
 ### 4. Corregir con IA
 
@@ -164,20 +164,20 @@ Cada formato inyecta en el prompt una **estructura obligatoria** propia, de modo
 
 | Formato | Estructura forzada |
 |---|---|
-| **Animación 2D** | TÍTULO / FORMATO / DURACION / SINOPSIS / ESCENAS con descripción visual animable / dialogos / (ACCION) / TRANSICIÓN / NOTAS DE PRODUCCION (paleta, estilo de dibujo) |
+| **Animación 2D** | TÍTULO / FORMATO / DURACIÓN / SINOPSIS / ESCENAS con descripción visual animable / diálogos / (ACCION) / TRANSICIÓN / NOTAS DE PRODUCCION (paleta, estilo de dibujo) |
 | **Animación 3D** | Igual que 2D + NOTAS VFX (particulas, simulaciones) y estilo de render (PBR, toon, realista) |
-| **Cortometraje** | Estilo Hollywood: TÍTULO / LOGLINE / SINOPSIS / PERSONAJES / ESCENA INT./EXT. / dialogos / (PARENTETICO) / TRANSICIÓN / planteamiento-nudo-climax |
-| **Largometraje** | Como corto + resumen ACTO I/II/III y mínimo 8 escenas con dialogos completos |
+| **Cortometraje** | Estilo Hollywood: TÍTULO / LOGLINE / SINOPSIS / PERSONAJES / ESCENA INT./EXT. / diálogos / (PARENTETICO) / TRANSICIÓN / planteamiento-nudo-climax |
+| **Largometraje** | Como corto + resumen ACTO I/II/III y mínimo 8 escenas con diálogos completos |
 | **Documental** | TESIS / escaleta con duraciones / SECUENCIAS / VOZ EN OFF literal / ENTREVISTA / ARCHIVO-B-ROLL / tono (observacional, expositivo, poetico) |
 | **YouTube** | TÍTULO clickbait (max 60 caracteres) / HOOK (0:00-0:30) / INTRO / SECCIONES con timestamps / notas [B-ROLL], [TEXTO EN PANTALLA], [ZOOM] / CTA FINAL |
-| **Podcast** | CABECERA con [SFX] / BLOQUES con duracion / LOCUTOR-INVITADO literal / CIERRE con CTA |
-| **Teatro** | ACTOS / ESCENAS / escenografia e iluminacion / dialogos `PERSONAJE:` / acotaciones |
-| **Videojuego** | MISIONES / CONTEXTO de gameplay / cinematicas / dialogos ramificados (OPCIÓN A/B) / RESULTADO de cada eleccion / bosses y lore |
+| **Podcast** | CABECERA con [SFX] / BLOQUES con duración / LOCUTOR-INVITADO literal / CIERRE con CTA |
+| **Teatro** | ACTOS / ESCENAS / escenografia e iluminacion / diálogos `PERSONAJE:` / acotaciones |
+| **Videojuego** | MISIONES / CONTEXTO de gameplay / cinematicas / diálogos ramificados (OPCIÓN A/B) / RESULTADO de cada eleccion / bosses y lore |
 | **Publicidad** | SPOT / MARCA / OBJETIVO / ESCENAS con tiempos / V.O. literal / SFX / packshot + slogan |
 | **TikTok / Reels / Shorts** | GANCHO (0:00-0:03, critico) / BEATS con tiempos / [TEXTO EN PANTALLA] / CTA final |
 | **Serie** | COLD OPEN / RECAP / ESCENAS / ACTOS / cliffhanger de cierre / arco de temporada |
 
-Reglas globales aplicadas siempre: respuesta en texto plano sin markdown, personajes en MAYUSCULAS antes del dialogo, descripciones cinematograficas en presente, guion completo con principio-desarrollo-final.
+Reglas globales aplicadas siempre: respuesta en texto plano sin markdown, personajes en MAYUSCULAS antes del diálogo, descripciones cinematograficas en presente, guion completo con principio-desarrollo-final.
 
 ---
 
@@ -185,7 +185,7 @@ Reglas globales aplicadas siempre: respuesta en texto plano sin markdown, person
 
 ### Alcance por 2 vias
 
-**Via 1 — Selección manual**: selecciona texto con el raton dentro del editor. Un badge muestra "Selección: N caracteres". Tiene prioridad sobre la via 2 (boton "Quitar selección" para desactivarla).
+**Via 1 — Selección manual**: selecciona texto con el raton dentro del editor. Un badge muestra "Selección: N caracteres". Tiene prioridad sobre la via 2 (botón "Quitar selección" para desactivarla).
 
 **Via 2 — Por escenas**: escribe en el campo "O indicar escenas". Sintaxis soportada:
 
@@ -202,10 +202,10 @@ La app divide el guion en bloques detectando encabezados (`ESCENA`, `SECUENCIA`,
 
 ### Flujo
 
-1. Escribe la **instrucción de corrección** (ej. *"haz este dialogo mas comico y mas corto"*).
+1. Escribe la **instrucción de corrección** (ej. *"haz este diálogo mas comico y mas corto"*).
 2. Pulsa **Corregir con IA**.
 3. La app envia a la IA: una **ventana de contexto** alrededor del fragmento (3000 caracteres antes / 1500 después, para no gastar tokens), el fragmento marcado y tu instrucción.
-4. La IA debe devolver el fragmento corregido envuelto en `<script_content>...</script_content>`. Una función `cleanLLMResponse()` extrae solo ese contenido; si el modelo ignora las etiquetas, una heuristica recorta las lineas conversacionales ("Aquí tienes...", "Claro...", "Espero que te sirva...") sin tocar dialogos reales.
+4. La IA debe devolver el fragmento corregido envuelto en `<script_content>...</script_content>`. Una función `cleanLLMResponse()` extrae solo ese contenido; si el modelo ignora las etiquetas, una heurística recorta las lineas conversacionales ("Aquí tienes...", "Claro...", "Espero que te sirva...") sin tocar diálogos reales.
 5. Solo se reemplaza el rango indicado; el resto del guion queda **intacto**.
 
 ### Historial y deshacer
@@ -218,7 +218,7 @@ La app divide el guion en bloques detectando encabezados (`ESCENA`, `SECUENCIA`,
 
 ## Proyectos guardados
 
-- Boton **Guardar proyecto**: guarda el guion + todos los parámetros (idea, formato, genero, etc.) en localStorage (máximo 30).
+- Botón **Guardar proyecto**: guarda el guion + todos los parámetros (idea, formato, género, etc.) en localStorage (máximo 30).
 - La lista de **Proyectos guardados** permite **Abrir** (restaura todo) o **X** (eliminar).
 - Los títulos se extraen de la linea `TITULO:` del guion.
 - Si el almacenamiento del navegador se llena, la app ejecuta una limpieza de emergencia automática (ver [Seguridad](#seguridad)).
@@ -227,7 +227,7 @@ La app divide el guion en bloques detectando encabezados (`ESCENA`, `SECUENCIA`,
 
 ## Exportación
 
-| Boton | Formato | Detalle |
+| Botón | Formato | Detalle |
 |---|---|---|
 | **Copiar** | portapapeles | con fallback para navegadores sin `navigator.clipboard` |
 | **.txt** | texto plano | UTF-8, nombre = título del guion |
@@ -243,7 +243,7 @@ La app clasifica cada linea y le da el tratamiento profesional estandar:
 - `FORMATO: / DURACION: / SINOPSIS: ...` → etiquetas en negrita.
 - `ESCENA 1 — INT. LUGAR — DIA` → **negrita**, en mayusculas, con espacio previo.
 - `LIA` (linea en MAYUSCULAS) → **nombre de personaje CENTRADO** en negrita.
-- Linea siguiente → **dialogo** en bloque indentado (izquierda/derecha).
+- Linea siguiente → **diálogo** en bloque indentado (izquierda/derecha).
 - `(acotacion)` → centrada en italica.
 - `CORTE A: / FUNDIDO: / TRANSICION:` → alineada a la derecha.
 - Texto normal → parrafo de accion.
@@ -272,7 +272,7 @@ La app clasifica cada linea y le da el tratamiento profesional estandar:
 | xAI Grok | grok-2 | Pago | `xai-...` |
 | Personalizado | cualquier endpoint OpenAI-compatible | — | opcional (Ollama/LM Studio) |
 
-**Recomendado para empezar**: Google Gemini (una sola key, ~1500 peticiones/dia gratis, excelente en espanol). Guia paso a paso para obtener cada key: [`MANUAL_APIS.md`](MANUAL_APIS.md).
+**Recomendado para empezar**: Google Gemini (una sola key, ~1500 peticiones/dia gratis, excelente en espanol). Guía paso a paso para obtener cada key: [`MANUAL_APIS.md`](MANUAL_APIS.md).
 
 > **Nota sobre limites gratuitos**: algunos planes gratuitos limitan los tokens por minuto (ej. Groq on_demand: 8000 TPM). La app ajusta automaticamente el `max_tokens` por proveedor (5120 en Groq) y las correcciones usan ventanas de contexto reducidas para no reventar esos limites.
 
@@ -319,7 +319,7 @@ La app clasifica cada linea y le da el tratamiento profesional estandar:
 El endpoint `/api/chat` **no acepta URLs arbitrarias**. `validateProxyUrl()` aplica:
 
 - **Whitelist estricta** de dominios: `api.openai.com`, `generativelanguage.googleapis.com`, `api.mistral.ai`, `api.deepseek.com`, `api.groq.com`, `api.fireworks.ai`, `api.together.xyz`, `openrouter.ai`, `api.x.ai`, `opencode.ai`.
-- Comparacion **exacta** de hostname en minusculas (bloquea `api.openai.com.evil.com` y similares).
+- Comparación **exacta** de hostname en minusculas (bloquea `api.openai.com.evil.com` y similares).
 - Prohibido: credenciales en URL (`https://user@host`), puertos no estandar, protocolos no http(s), redirecciones 3xx (no se siguen).
 - `localhost` bloqueado por defecto; activable solo con `ALLOW_LOCALHOST=1` (Ollama / LM Studio), solo http y puertos de IA conocidos.
 - **Anti DNS rebinding**: `secureLookup` resuelve el hostname en el momento de conectar y bloquea la conexión si alguna IP es privada, loopback, link-local o reservada (10/8, 172.16/12, 192.168/16, 127/8, 169.254/16, 100.64/10, `::1`, ULA, fe80::/10...). Protege en caso de que se agreguen hosts propios via `SSRF_EXTRA_HOSTS`.
@@ -357,7 +357,7 @@ Wrapper `lsSet()` con limpieza de emergencia ante `QuotaExceededError` (código 
 
 ### Limpieza anti-"chattiness" de los LLM
 
-`cleanLLMResponse()` evita que texto conversacional de la IA contamine el guion: extrae el contenido entre `<script_content>...</script_content>` (instruido en el prompt); si no hay etiquetas, una heuristica recorta lineas de saludo/despedida en ES/EN con protecciones para no borrar encabezados de escena, metadatos o dialogos reales ("Claro." como dialogo se respeta).
+`cleanLLMResponse()` evita que texto conversacional de la IA contamine el guion: extrae el contenido entre `<script_content>...</script_content>` (instruido en el prompt); si no hay etiquetas, una heurística recorta lineas de saludo/despedida en ES/EN con protecciones para no borrar encabezados de escena, metadatos o diálogos reales ("Claro." como diálogo se respeta).
 
 ### Privacidad
 
@@ -427,7 +427,7 @@ FREE-SCRIPT-POWER/
 ├── server.js         # Servidor Node: estaticos + proxy /api/chat
 ├── logo-fap.png      # Logo corporativo (portada y marca de agua)
 ├── README.md         # Este documento
-├── MANUAL_APIS.md    # Guia paso a paso para obtener cada API key
+├── MANUAL_APIS.md    # Guía paso a paso para obtener cada API key
 ├── INFORME.md        # Informe técnico detallado de arquitectura
 └── .gitignore
 ```
